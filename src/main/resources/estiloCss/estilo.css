@@ -41,6 +41,23 @@ AnchorPane {
     -fx-background-color: linear-gradient(to bottom, #00796b, #004d40);
 }
 
+#botonEncriptarDES, #botonDesencriptarDES {
+    -fx-background-color: #ff9800; /* Color naranja */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-border-radius: 5;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 152, 0, 0.3), 5, 0, 0, 2);
+}
+
+#botonEncriptarDES:hover, #botonDesencriptarDES:hover {
+    -fx-background-color: #fb8c00;
+}
+
+#botonEncriptarDES:pressed, #botonDesencriptarDES:pressed {
+    -fx-background-color: #ef6c00;
+}
+
 .button:pressed {
     -fx-background-color: #004d40;
 }

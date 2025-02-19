@@ -17,13 +17,16 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
+/**
+ * Controlador para la interfaz de encriptación y desencriptación de textos utilizando los algoritmos AES y DES.
+ */
 public class EncriptacionController {
 
 
     @FXML
     private TextField textoEncriptar;
     @FXML
-    private TextArea textoEncriptado;
+    private TextArea textAreaTextoEncriptado;
     @FXML
     private Button botonEncriptarAES;
     @FXML
@@ -43,19 +46,15 @@ public class EncriptacionController {
     @FXML
     private Button reestablecer;
 
-    /**
-     * Variable que almacena la contraseña encriptada
-     */
-    private String hashedPassword;
+
+    private String contrasenyaEncriptada;
 
     /**
-     * Método que se ejecuta al iniciar la aplicación
+     * Inicializa los eventos de los botones al iniciar la interfaz.
      */
     @FXML
     public void initialize() {
-        /**
-         * Botón que encripta un texto con AES
-         */
+
         botonEncriptarAES.setOnAction(e -> {
             if (textoEncriptar.getText().isEmpty() && textIntroductirContrasenya.getText().isEmpty()) {
                 alertaCamposVacios();
@@ -65,16 +64,16 @@ public class EncriptacionController {
                 return;
             }
 
-            String text = textoEncriptar.getText();
+            String texto = textoEncriptar.getText();
             String contrasenya = textIntroductirContrasenya.getText();
-            String encryptedText = null;
+            String encripTexto;
             try {
-                encryptedText = encryptAES(text, contrasenya);
+                encripTexto = encryptAES(texto, contrasenya);
             } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException |
                      InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
                 throw new RuntimeException(ex);
             }
-            textoEncriptado.setText("Texto encriptado con AES: " + encryptedText);
+            textAreaTextoEncriptado.setText("Texto encriptado con AES: " + encripTexto);
         });
 
         /**
@@ -85,16 +84,16 @@ public class EncriptacionController {
                 alertaCamposVacios();
                 return;
             }
-            String encryptedText = textoEncriptado.getText().replace("Texto encriptado con AES: ", "");
+            String textoEncriptado = textAreaTextoEncriptado.getText().replace("Texto encriptado con AES: ", "");
             String contrasenya = textIntroductirContrasenya.getText();
-            String decryptedText = null;
+            String textoDesencriptado ;
             try {
-                decryptedText = decryptAES(encryptedText, contrasenya);
+                textoDesencriptado = decryptAES(textoEncriptado, contrasenya);
             } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException |
                      InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
                 throw new RuntimeException(ex);
             }
-            textoEncriptado.appendText("\nTexto desencriptado con AES: " + decryptedText);
+            textAreaTextoEncriptado.appendText("\nTexto desencriptado con AES: " + textoDesencriptado);
         });
 
         /**
@@ -108,16 +107,16 @@ public class EncriptacionController {
                 alertaCamposIncorrectos();
                 return;
             }
-            String text = textoEncriptar.getText();
+            String texto = textoEncriptar.getText();
             String contrasenya = textIntroductirContrasenya.getText();
-            String encryptedText = null;
+            String textoEncriptado;
             try {
-                encryptedText = encryptDES(text, contrasenya);
+                textoEncriptado = encryptDES(texto, contrasenya);
             } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException |
                      InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
                 throw new RuntimeException(ex);
             }
-            textoEncriptado.appendText("\nTexto encriptado con DES: " + encryptedText);
+            textAreaTextoEncriptado.appendText("\nTexto encriptado con DES: " + textoEncriptado);
         });
 
         /**
@@ -128,42 +127,42 @@ public class EncriptacionController {
                 alertaCamposVacios();
                 return;
             }
-            String encryptedText = textoEncriptado.getText().replace("Texto encriptado con DES: ", "");
-            encryptedText = encryptedText.split("\n")[encryptedText.split("\n").length - 1];
+            String textoEncriptado = textAreaTextoEncriptado.getText().replace("Texto encriptado con DES: ", "");
+            textoEncriptado = textoEncriptado.split("\n")[textoEncriptado.split("\n").length - 1];
             String contrasenya = textIntroductirContrasenya.getText();
-            encryptedText = encryptedText.replaceAll("\\s", "");
-            String decryptedText = null;
+            textoEncriptado = textoEncriptado.replaceAll("\\s", "");
+            String textoDesencriptado = null;
             try {
-                decryptedText = decryptDES(encryptedText, contrasenya);
+                textoDesencriptado  = decryptDES(textoEncriptado, contrasenya);
             } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException |
                      InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
                 throw new RuntimeException(ex);
             }
-            textoEncriptado.appendText("\nTexto desencriptado con DES: " + decryptedText);
+            textAreaTextoEncriptado.appendText("\nTexto desencriptado con DES: " + textoDesencriptado );
         });
 
         /**
-         * Botón que encripta una contraseña y la muestra en el TextArea correspondiente
+         * Botón que encripta una contraseña
          */
         botonContrasenya.setOnAction(e -> {
             if (textIntroductirContrasenya.getText().isEmpty()) {
                 alertaCamposVacios();
                 return;
             }
-            String password = textIntroductirContrasenya.getText();
-            hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-            texContrasenya.setText("Contraseña encriptada: " + hashedPassword);
+            String contrasenya = textIntroductirContrasenya.getText();
+            contrasenyaEncriptada = BCrypt.hashpw(contrasenya, BCrypt.gensalt());
+            texContrasenya.setText("Contraseña encriptada: " + contrasenyaEncriptada);
         });
         /**
          * Botón que comprueba si una contraseña es correcta
          */
         botonComprobarContrasenya.setOnAction(e -> {
-            if (hashedPassword == null || textIntroductirContrasenya.getText().isEmpty()) {
+            if (contrasenyaEncriptada == null || textIntroductirContrasenya.getText().isEmpty()) {
                 alertaCamposVacios();
                 return;
             }
             String checkContra = textIntroductirContrasenya.getText();
-            boolean esCorrecta = BCrypt.checkpw(checkContra, hashedPassword);
+            boolean esCorrecta = BCrypt.checkpw(checkContra, contrasenyaEncriptada);
             texContrasenya.appendText("\n¿Contraseña correcta? " + esCorrecta);
             if (esCorrecta) {
                 alertaContrasenyaCorrecta();
@@ -172,10 +171,12 @@ public class EncriptacionController {
             }
 
         });
-
+        /**
+         * Botón que reestablece los campos
+         */
         reestablecer.setOnAction(e -> {
             textoEncriptar.clear();
-            textoEncriptado.clear();
+            textAreaTextoEncriptado.clear();
             textIntroductirContrasenya.clear();
             texContrasenya.clear();
         });
@@ -183,74 +184,112 @@ public class EncriptacionController {
 
 
     /**
-     * Método que genera una clave para encriptar y desencriptar
+     * Genera una clave secreta basada en una contraseña y el algoritmo de cifrado.
+     *
+     * @param contrasenya La contraseña utilizada para generar la clave.
+     * @param algoritmo   El algoritmo de cifrado (AES o DES).
+     * @return Una clave secreta generada a partir de la contraseña.
+     * @throws NoSuchAlgorithmException    Si el algoritmo de hash no está disponible.
+     * @throws UnsupportedEncodingException Si la codificación no es soportada.
      */
-    private SecretKey obtenerContrasenya(String password, String algorithm) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        byte[] key = password.getBytes(StandardCharsets.UTF_8);
+    private SecretKey obtenerContrasenya(String contrasenya, String algoritmo) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        byte[] clave = contrasenya.getBytes(StandardCharsets.UTF_8);
         MessageDigest sha = MessageDigest.getInstance("SHA-1");
-        key = sha.digest(key);
-        key = Arrays.copyOf(key, algorithm.equals("AES") ? 16 : 8); //AES  16 bytes, DES uses 8 bytes
-        return new SecretKeySpec(key, algorithm);
+        clave = sha.digest(clave);
+        clave = Arrays.copyOf(clave, algoritmo.equals("AES") ? 16 : 8); //AES  16 bytes, DES uses 8 bytes
+        return new SecretKeySpec(clave, algoritmo);
     }
 
 
     /**
-     * Método que encripta un texto con AES
+     * Encripta un texto utilizando el algoritmo AES.
+     *
+     * @param datos      Texto a encriptar.
+     * @param contrasenya Contraseña utilizada para generar la clave de encriptación.
+     * @return Texto encriptado en formato Base64.
+     * @throws UnsupportedEncodingException Si la codificación no es soportada.
+     * @throws NoSuchAlgorithmException Si el algoritmo de hash no está disponible.
+     * @throws NoSuchPaddingException Si el relleno no está disponible.
+     * @throws InvalidKeyException Si la clave no es válida.
+     * @throws IllegalBlockSizeException Si el tamaño del bloque no es válido.
+     * @throws BadPaddingException Si el relleno no es válido.
      */
-    private String encryptAES(String data, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    private String encryptAES(String datos, String contrasenya) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-            SecretKey aesKey = obtenerContrasenya(password, "AES");
+            SecretKey claveAES = obtenerContrasenya(contrasenya, "AES");
             Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-            byte[] encryptedData = cipher.doFinal(data.getBytes());
-            return Base64.getEncoder().encodeToString(encryptedData);
-
-
+            cipher.init(Cipher.ENCRYPT_MODE, claveAES);
+            byte[] datosEncriptados = cipher.doFinal(datos.getBytes());
+            return Base64.getEncoder().encodeToString(datosEncriptados);
     }
 
     /**
-     * Método que desencripta un texto con AES
+     * Desencripta un texto utilizando el algoritmo AES.
+     *
+     * @param datosEncriptados Texto encriptado en formato Base64.
+     * @param contrasenya       Contraseña utilizada para generar la clave de desencriptación.
+     * @return Texto desencriptado.
+     * @throws UnsupportedEncodingException Si la codificación no es soportada.
+     * @throws NoSuchAlgorithmException Si el algoritmo de hash no está disponible.
+     * @throws NoSuchPaddingException Si el relleno no está disponible.
+     * @throws InvalidKeyException Si la clave no es válida.
+     * @throws IllegalBlockSizeException Si el tamaño del bloque no es válido.
+     * @throws BadPaddingException Si el relleno no es válido.
      */
-    private String decryptAES(String encryptedData, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-            SecretKey aesKey = obtenerContrasenya(password, "AES");
+    private String decryptAES(String datosEncriptados, String contrasenya) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+
+            SecretKey claveAES = obtenerContrasenya(contrasenya, "AES");
             Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, aesKey);
-            byte[] decryptedData = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
-            return new String(decryptedData);
+            cipher.init(Cipher.DECRYPT_MODE, claveAES);
+            byte[] datosDesencriptados = cipher.doFinal(Base64.getDecoder().decode(datosEncriptados));
+            return new String(datosDesencriptados);
 
     }
 
     /**
      * Método que encripta un texto con DES
      *
-     * @param data
-     * @param password
+     * @param datos
+     * @param contrasenya contraseña con la que se encripta
+     * @return texto encriptado
+     * @throws UnsupportedEncodingException Si la codificación no es soportada.
+     * @throws NoSuchAlgorithmException Si el algoritmo de hash no está disponible.
+     * @throws NoSuchPaddingException Si el relleno no está disponible.
+     * @throws InvalidKeyException Si la clave no es válida.
+     * @throws IllegalBlockSizeException Si el tamaño del bloque no es válido.
+     * @throws BadPaddingException Si el relleno no es válido.
      */
-    private String encryptDES(String data, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    private String encryptDES(String datos, String contrasenya) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-            SecretKey desKey = obtenerContrasenya(password, "DES");
+            SecretKey desKey = obtenerContrasenya(contrasenya, "DES");
             Cipher cipher = Cipher.getInstance("DES");
             cipher.init(Cipher.ENCRYPT_MODE, desKey);
-            byte[] encryptedData = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(encryptedData);
+            byte[] datosEncriptados = cipher.doFinal(datos.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(datosEncriptados);
 
     }
 
     /**
      * Método que desencripta un texto con DES
      *
-     * @param encryptedData
-     * @param password
+     * @param datosEncriptados texto encriptado
+     * @param contrasenya contraseña con la que se desencripta
+     * @return texto desencriptado
+     * @throws UnsupportedEncodingException Si la codificación no es soportada.
+     * @throws NoSuchAlgorithmException Si el algoritmo de hash no está disponible.
+     * @throws NoSuchPaddingException Si el relleno no está disponible.
+     * @throws InvalidKeyException Si la clave no es válida.
+     * @throws IllegalBlockSizeException Si el tamaño del bloque no es válido.
+     * @throws BadPaddingException Si el relleno no es válido.
      */
-    private String decryptDES(String encryptedData, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-            SecretKey desKey = obtenerContrasenya(password, "DES");
+    private String decryptDES(String datosEncriptados, String contrasenya) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+            SecretKey desKey = obtenerContrasenya(contrasenya, "DES");
             Cipher cipher = Cipher.getInstance("DES");
             cipher.init(Cipher.DECRYPT_MODE, desKey);
-            System.out.println(encryptedData);
-            byte[] decodedData = Base64.getDecoder().decode(encryptedData);
-            byte[] decryptedData = cipher.doFinal(decodedData);
-            return new String(decryptedData, StandardCharsets.UTF_8);
+            byte[] datosDecodificados = Base64.getDecoder().decode(datosEncriptados);
+            byte[] datosDesencriptados = cipher.doFinal(datosDecodificados);
+            return new String(datosDesencriptados, StandardCharsets.UTF_8);
     }
 
     /**
@@ -275,6 +314,9 @@ public class EncriptacionController {
         alert.showAndWait();
     }
 
+    /**
+     * generar alerta para contraseña correcta
+     */
     public void alertaContrasenyaCorrecta(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Información");
@@ -283,6 +325,9 @@ public class EncriptacionController {
         alert.showAndWait();
     }
 
+    /**
+     * generar alerta para contraseña incorrecta
+     */
     public void alertaContrasenyaIncorrecta(){
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");

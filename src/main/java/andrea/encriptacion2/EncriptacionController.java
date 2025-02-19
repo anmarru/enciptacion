@@ -129,6 +129,7 @@ public class EncriptacionController {
                 return;
             }
             String encryptedText = textoEncriptado.getText().replace("Texto encriptado con DES: ", "");
+            encryptedText = encryptedText.split("\n")[encryptedText.split("\n").length - 1];
             String contrasenya = textIntroductirContrasenya.getText();
             encryptedText = encryptedText.replaceAll("\\s", "");
             String decryptedText = null;
@@ -246,6 +247,7 @@ public class EncriptacionController {
             SecretKey desKey = obtenerContrasenya(password, "DES");
             Cipher cipher = Cipher.getInstance("DES");
             cipher.init(Cipher.DECRYPT_MODE, desKey);
+            System.out.println(encryptedData);
             byte[] decodedData = Base64.getDecoder().decode(encryptedData);
             byte[] decryptedData = cipher.doFinal(decodedData);
             return new String(decryptedData, StandardCharsets.UTF_8);
